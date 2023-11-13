@@ -1,5 +1,3 @@
-const { render_main_app } = require('./app');
-
 const fs = require('fs');
 const CryptoJS = require('crypto-js');
 const express = require('express');
@@ -21,8 +19,27 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.render('login');
+  res.render('login', { message: 'If the entered username does not exist, a new account will be created.' });
 });
+
+app.post('/', (req, res) => {
+  if(req.body.status == 'success') {
+    res.render('app', { token: req.body.token });
+  } else if(req.body.status == 'failure') {
+    res.render('login', { message: 'An account with this username exists, but it couldn\'t be authenticated. Please try again' });
+  }
+});
+
+const redirect = (response, token) => {
+  let data;
+  if(token) {
+    data = { status: 'success', token: token };
+  } else {
+    data = { status: 'failure', token: null };
+  }
+
+  response.render('login_redirect', data);
+};
 
 app.post('/login', (req, res) => {
   if(!(req.body.user && req.body.pw)) {
@@ -44,10 +61,10 @@ app.post('/login', (req, res) => {
       const raw_token = decrypted_token.toString(CryptoJS.enc.Utf8);
 
       // LOGIN SUCCESS
-      render_main_app(res, raw_token);
+      redirect(res, raw_token);
     } else {
       // LOGIN FAILURE
-      render_main_app(res, "Login failed");
+      redirect(res, null);
     }
   } else {
     USERS_TEMP[acct.user] = { pw: acct.pw };
@@ -76,7 +93,7 @@ app.post('/registration', (req, res) => {
   fs.writeFileSync(ENV.userDataPath, JSON.stringify(USERS));
   
   // REGISTRATION SUCCESS
-  render_main_app(res, token);
+  redirect(res, token);
 });
 
 app.listen(ENV.port, _ => {

@@ -1,7 +1,5 @@
 module.exports = {
-  render_main_app: (response, token) => {
-      response.render('temp', { token: token });
-  }
+  main: 
 };
 
 /*
