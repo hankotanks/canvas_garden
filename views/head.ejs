@@ -2,9 +2,14 @@
 <html>
     <head>
         <title>Canvas Garden</title>
+        <% if(locals.scripts) { %>
+            <% for(let i = 0; i < scripts.length; i++) { %>
+                <script src="<%= scripts[i] %>"></script>
+            <% } %>
+        <% } %>
     </head>
     <% if(locals.onload){ %>
         <body onload="<%= onload %>">
-    <% } else{ %>  
+    <% } else{ %>
         <body>
     <% } %>

@@ -1,5 +1,17 @@
-<%- include('head') %>
-<p>
-    The main app <%= token %>
-</p>
+<%- include('head', { 
+    onload: "env(); new Courses()", 
+    scripts: [
+        "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js",
+        "https://cdn.socket.io/4.6.0/socket.io.min.js",
+        "../js/env.js",
+        "../js/courses.js"
+    ]
+}) %>
+<p id="token" style="display: none"><%= token %></p>
+<div id="container">
+    <ul id="courses">
+    
+    </ul>
+</div>
+
 <%- include('tail') %>

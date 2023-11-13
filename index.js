@@ -1,8 +1,11 @@
 const fs = require('fs');
 const CryptoJS = require('crypto-js');
 const express = require('express');
+const axios = require('axios');
+const socketIo = require('socket.io');
 
-const ENV = JSON.parse(fs.readFileSync('./env.json'));
+const ENV_PATH = './public/assets/env.json';
+const ENV = JSON.parse(fs.readFileSync(ENV_PATH));
 
 USERS = undefined;
 USERS_TEMP = {};
@@ -98,6 +101,28 @@ app.post('/token', (req, res) => {
   redirect(res, token);
 });
 
-app.listen(ENV.port, _ => {
+const server = app.listen(ENV.port, _ => {
   console.log(`Server listening on ${ENV.port}`);
+});
+
+const io = socketIo(server, {
+  cors: {
+    origin: '*',
+  }
+});
+
+io.on('connection', (socket) => {
+  socket.on('getCourses', token => {
+    const REQUEST = 'https://canvas.instructure.com/api/v1/courses';
+
+    axios.get(REQUEST, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).then(response => {
+      const courses = response.data.map(course => course.name);
+
+      socket.emit('getCourses', courses);
+    }).catch(error => socket.emit('error', JSON.stringify(error)));
+  });
 });
