@@ -1,0 +1,26 @@
+{
+  "name": "canvas_garden",
+  "version": "1.0.0",
+  "description": "A webapp that rewards you for completing Canvas assignments with seeds to plant in your virtual garden!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hankotanks/canvas_garden.git"
+  },
+  "author": "Hank Lewis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hankotanks/canvas_garden/issues"
+  },
+  "homepage": "https://github.com/hankotanks/canvas_garden#readme",
+  "dependencies": {
+    "axios": "^1.6.1",
+    "crypto-js": "^4.2.0",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "fs": "^0.0.1-security"
+  }
+}
