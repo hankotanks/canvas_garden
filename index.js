@@ -6,13 +6,18 @@ const express = require('express');
 
 const ENV = JSON.parse(fs.readFileSync('./env.json'));
 
-USERS = JSON.parse(fs.readFileSync(ENV.userDataPath, 'utf-8'));
+USERS = undefined;
 USERS_TEMP = {};
+
+if(fs.existsSync(ENV.userDataPath)) {
+  USERS = JSON.parse(fs.readFileSync(ENV.userDataPath, 'utf-8'));
+} else {
+  USERS = {};
+}
 
 const app = express();
 
 app.set('view engine', 'ejs');
-
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
