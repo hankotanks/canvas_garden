@@ -3,4 +3,8 @@
     <head>
         <title>Canvas Garden</title>
     </head>
-    <body>
+    <% if(locals.onload){ %>
+        <body onload="<%= onload %>">
+    <% } else{ %>  
+        <body>
+    <% } %>

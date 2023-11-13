@@ -1,13 +1,7 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Canvas Garden</title>
-    </head>
-    <body onload="document.forms['redirect'].submit();">
-        <form action="/" method="post" name="redirect">
-            <input type="hidden" id="status" name="status" value="<%= status %>" required />
-            <input type="hidden" id="token" name="token" value="<%= token %>" required />
-            <input type="submit" value="" class="display: none" />
-        </form>
-    </body>
-</html>
+<%- include('head', { onload: "document.forms['redirect'].submit()"}) %>
+<form action="/" method="post" name="redirect">
+    <input type="hidden" id="status" name="status" value="<%= status %>" required />
+    <input type="hidden" id="token" name="token" value="<%= token %>" required />
+    <input type="submit" value="" class="display: none" />
+</form>
+<%- include('tail') %>

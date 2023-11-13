@@ -1,5 +1,5 @@
 <%- include('head') %>
-<form action="/registration" method="post">
+<form action="/token" method="post">
     <input type="password" placeholder="User Token" id="token" name="token" required />
     <input type="hidden" id="user" name="user" value="<%= user %>" required />
     <input type="submit" value="Submit Token" />

@@ -16,7 +16,9 @@ if(fs.existsSync(ENV.userDataPath)) {
 const app = express();
 
 app.set('view engine', 'ejs');
+
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'))
 
 app.get('/', (req, res) => {
   res.render('login', { message: 'If the entered username does not exist, a new account will be created.' });
@@ -41,7 +43,7 @@ const redirect = (response, token) => {
   response.render('login_redirect', data);
 };
 
-app.post('/login', (req, res) => {
+app.post('/register', (req, res) => {
   if(!(req.body.user && req.body.pw)) {
     throw new Error('Invalid login object recieved');
   }
@@ -75,7 +77,7 @@ app.post('/login', (req, res) => {
   res.end();
 });
 
-app.post('/registration', (req, res) => {
+app.post('/token', (req, res) => {
   if(!(req.body.user && req.body.token)) {
     throw new Error('Invalid token object recieved');
   }
