@@ -125,4 +125,35 @@ io.on('connection', (socket) => {
       socket.emit('getCourses', courses);
     }).catch(error => socket.emit('error', JSON.stringify(error)));
   });
+
+  socket.on('getAssignments', async token => {
+    const assignments = [];
+
+    const next_regex = /,<.+?(?=>; rel="next")/;
+
+    let next_request = 'https://canvas.instructure.com/api/v1/users/self/activity_stream/';
+    while(next_request != null) {
+      let response = await axios.get(next_request, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const match = response.headers.link.match(next_regex);
+
+      next_request = match ? match[0].substring(2) : null;
+      const batch = response.data
+        .filter(item => item.type == "Submission" && item.submitted_at)
+        .map(item => ({
+          title: item.title,
+          id: item.assignment_id,
+          course_name: item.course.name,
+          due_at: item.assignment.due_at
+        }));
+
+      assignments.push(...batch);
+    }
+
+    socket.emit('getAssignments', assignments);
+  });
 });
