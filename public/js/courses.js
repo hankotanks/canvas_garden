@@ -9,7 +9,9 @@ const Courses = class {
         this.user = $('#user').text();
 
         this.socket = io.connect(`http://localhost:${window.ENV.port}`);
+
         this.socket.emit('getOldAssignments', { user: this.user, token: this.token });
+        console.log(this.user);
         this.socket.emit('getResourceCounts', this.user);
 
         this.socket.on('getResourceCounts', resources => {
@@ -25,23 +27,73 @@ const Courses = class {
             this.socket.on('getCurrentAssignments', current_assignments => {
 
                 let completed_assignments = stored_assignments.filter(
-                    sta => !current_assignments.some(ca => sta.id === ca.id));
+                    sta => !current_assignments.some(ca => sta.id === ca.id)) || [];
+                
                 for(let i = 0; i < completed_assignments.length; i++) {
-                    $('#courses').append(`<li><button id="assignment-${completed_assignments[i].id}">${ completed_assignments[i].title } (${ completed_assignments[i].course_name })</button></li>`);
+                    $('#assignments-column').append(`
+                        <div class="box" id="box-${ completed_assignments[i].id }">
+                            <div class="title is-5">
+                                ${ completed_assignments[i].title }
+                            </div>
+                            <div class="subtitle is-6">
+                                ${ completed_assignments[i].course_name }
+                            </div>
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="container">
+                                            <emph>${ completed_assignments[i].due_at }</emph>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <button class="button is-primary" id="assignment-${ completed_assignments[i].id }">
+                                            Test
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    `);
                     $(`#assignment-${completed_assignments[i].id}`).on('click', _ => {
-                        $(`#assignment-${completed_assignments[i].id}`).remove();
+                        $(`#box-${completed_assignments[i].id}`).remove();
 
                         this.socket.emit('redeemAssignment', this.user);
-
-                        
                     });
                 }
-
-                for(let i = 0; i <  current_assignments.length; i++) {
-                    $('#courses').append(`<li>${ current_assignments[i].title } (${ current_assignments[i].course_name })</li>`);
+                for(let i = 0; i < current_assignments.length; i++) {
+                    $('#assignments-column').append(`
+                        <div class="box">
+                            <div class="title is-5">
+                                ${ current_assignments[i].title }
+                            </div>
+                            <div class="subtitle is-6">
+                                ${ current_assignments[i].course_name }
+                            </div>
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <div class="container">
+                                            <emph>${ current_assignments[i].due_at }</emph>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item"></div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    `);
                 }
 
-                this.socket.emit('storeAssignments', { user: this.user, token: this.token, assignments: current_assignments });
+                this.socket.emit('storeAssignments', { 
+                    user: this.user, 
+                    token: this.token,
+                    assignments: current_assignments 
+                });
             });
         });
 
@@ -57,7 +109,7 @@ const Courses = class {
                 <p>${error}</p>
             `;
 
-            $('#container').html(formatted_error);
+            $('.container').html(formatted_error);
         })
     }
 }

@@ -182,6 +182,7 @@ io.on('connection', (socket) => {
 
   socket.on('redeemAssignment', user => {
     USERS[user].resources.seeds += 1;
+    console.log("REDEEMED");
     socket.emit('getResourceCounts', USERS[user].resources);
   });
 });

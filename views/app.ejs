@@ -7,13 +7,30 @@
         "../js/courses.js"
     ]
 }) %>
+
 <p id="user" style="display: none"><%= user %></p>
 <p id="token" style="display: none"><%= token %></p>
-<p id="resources">Seeds: 0</p>
+
 <div id="container">
-    <ul id="courses">
+    <style type="text/css" media="screen">
+        #assignments-column {
+            overflow-y: scroll;
+            height: 100vh;
+        }
+    </style>
+    <div class="columns is-centered">
+        <div id="assignments-column" class="column is-one-third is-fullheight">
     
-    </ul>
+        </div>
+        <div class="column is-one-third">
+    
+        </div>
+        <div class="column is-one-third">
+            <div id="resources" class="container">
+                Seeds: 0
+            </div>
+        </div>
+    </div>
 </div>
 
 <%- include('tail') %>
