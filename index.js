@@ -87,14 +87,23 @@ app.post('/token', (req, res) => {
 
   const { user, token } = req.body;
 
+  const garden = [];
+  for(let i = 0; i < 12; i++) {
+    garden[i] = [];
+    for(let j = 0; j < 12; j++) {
+      garden[i][j] = -1;
+    }
+  }
+
   USERS[user] = {
     user: user,
     token: CryptoJS.AES.encrypt(token, USERS_TEMP[user].pw).toString(),
     checkSum: CryptoJS.MD5(USERS_TEMP[user].pw).toString(),
     stored_assignments: [],
     resources: {
-      seeds: 0
-    }
+      seeds: 9
+    },
+    garden: garden
   };
 
   delete USERS_TEMP[user];
@@ -115,6 +124,7 @@ const io = socketIo(server, {
   }
 });
 
+
 io.on('connection', (socket) => {
   socket.on('getCourses', token => {
     const REQUEST = 'https://canvas.instructure.com/api/v1/courses';
@@ -134,6 +144,7 @@ io.on('connection', (socket) => {
     let { user, token } = data;
 
     console.log(user);
+
     socket.emit('getOldAssignments', USERS[user].stored_assignments || []);
   });
 
@@ -182,7 +193,29 @@ io.on('connection', (socket) => {
 
   socket.on('redeemAssignment', user => {
     USERS[user].resources.seeds += 1;
-    console.log("REDEEMED");
     socket.emit('getResourceCounts', USERS[user].resources);
+  });
+
+  socket.on('getGarden', user => {
+    socket.emit('getGarden', USERS[user].garden);
+  });
+
+  socket.on('attemptToPlant', data => {
+    const { user, x, y, idx } = data;
+
+    let success = false;
+    if(USERS[user].resources.seeds && idx != undefined) {
+      if(USERS[user].garden[x][y] == -1) {
+        USERS[user].garden[x][y] = idx;
+
+        USERS[user].resources.seeds -= 1;
+        success = true;
+      }
+    } 
+
+    socket.emit('attemptToPlant', {
+      success: success,
+      resources: USERS[user].resources
+    });
   });
 });
