@@ -3,6 +3,7 @@ const CryptoJS = require('crypto-js');
 const express = require('express');
 const axios = require('axios');
 const socketIo = require('socket.io');
+const moment = require('moment');
 
 const ENV_PATH = './public/assets/env.json';
 const ENV = JSON.parse(fs.readFileSync(ENV_PATH));
@@ -91,7 +92,7 @@ app.post('/token', (req, res) => {
   for(let i = 0; i < 12; i++) {
     garden[i] = [];
     for(let j = 0; j < 12; j++) {
-      garden[i][j] = -1;
+      garden[i][j] = null;
     }
   }
 
@@ -197,6 +198,20 @@ io.on('connection', (socket) => {
   });
 
   socket.on('getGarden', user => {
+    for(let i = 0; i < 12; i++) {
+      for(let j = 0; j < 12; j++){
+        if(USERS[user].garden[i][j] != null) {
+          if(USERS[user].garden[i][j].planted_at) {
+            const duration = moment.duration(moment(new Date()).diff(moment(USERS[user].garden[i][j].planted_at)));
+            const hours = duration.asHours();
+
+            USERS[user].garden[i][j].stage += ((hours - (hours % 72)) / 72);
+            USERS[user].garden[i][j].planted_at = moment(new Date());
+          }
+        }
+      }
+    }
+
     socket.emit('getGarden', USERS[user].garden);
   });
 
@@ -205,8 +220,12 @@ io.on('connection', (socket) => {
 
     let success = false;
     if(USERS[user].resources.seeds && idx != undefined) {
-      if(USERS[user].garden[x][y] == -1) {
-        USERS[user].garden[x][y] = idx;
+      if(USERS[user].garden[x][y] == null) {
+        USERS[user].garden[x][y] = {
+          species: idx,
+          stage: 0,
+          planted_at: moment().format()
+        }
 
         USERS[user].resources.seeds -= 1;
         success = true;

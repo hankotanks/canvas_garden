@@ -70,7 +70,9 @@ const Courses = class {
             this.socket.on('getGarden', garden => {
                 for(let i = 0; i < 12; i++) {
                     for(let j = 0; j < 12; j++) {
-                        clipImage(this.sprite_sheet, garden_ctx, i, j, garden[i][j], 0);
+                        if(garden[i][j] != null) {
+                            clipImage(this.sprite_sheet, garden_ctx, i, j, garden[i][j].species, garden[i][j].stage);
+                        }
                     }
                 }
             });
@@ -95,10 +97,10 @@ const Courses = class {
                         if(!data.success) {
                             console.log('Failed to plant...');
                         } else {
-                            
                             clipImage(this.sprite_sheet, garden_ctx, x, y, this.selected, 0);
                             this.resources = data.resources;
-                            console.log(this.resources);
+
+                            $('#resources').text(`Seeds: ${this.resources.seeds}`);
                         }
                     }); 
                 }
